@@ -44,17 +44,21 @@ tool.Activated:Connect(function()
 		if hum and hum.Health > 0 and hit.Parent ~= character then
 			-- Поставим игрока в режим "платформы" (не может двигаться)
 			hum.PlatformStand = true
-			-- Делаем небольшую паузу, чтобы эффект сработал
-			wait(1)
-			-- Возвращаем способность двигаться
+			wait(0.1)
 			hum.PlatformStand = false
 
-			-- Применим небольшой отталкивающий эффект
-			local force = Instance.new("BodyVelocity")
-			force.MaxForce = Vector3.new(10000, 10000, 10000) -- Сила отталкивания
-			force.Velocity = Vector3.new(0, 50, 0) -- Отталкиваем вверх
-			force.Parent = hum.Parent:FindFirstChild("HumanoidRootPart")
-			game.Debris:AddItem(force, 0.1) -- Удаляем после 0.1 секунды
+			-- Создаём физический эффект падения
+			local humanoidRootPart = hit.Parent:FindFirstChild("HumanoidRootPart")
+			if humanoidRootPart then
+				-- Добавим силу, чтобы "ронять" игрока
+				local bodyVelocity = Instance.new("BodyVelocity")
+				bodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000) -- Высокая сила
+				bodyVelocity.Velocity = Vector3.new(0, -50, 0)  -- Падает вниз
+				bodyVelocity.Parent = humanoidRootPart
+
+				-- Удаляем BodyVelocity через 1 секунду
+				game.Debris:AddItem(bodyVelocity, 1)
+			end
 		end
 	end)
 end)
