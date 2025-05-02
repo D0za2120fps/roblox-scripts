@@ -24,6 +24,7 @@ tool.Activated:Connect(function()
 	local root = character:FindFirstChild("HumanoidRootPart")
 	if not root then return end
 
+	-- Создаем кубик, который будет выстреливаться
 	local cube = Instance.new("Part")
 	cube.Size = Vector3.new(2,2,2)
 	cube.Color = Color3.fromRGB(255, 0, 0)
@@ -34,15 +35,26 @@ tool.Activated:Connect(function()
 	cube.CanCollide = true
 	cube.Parent = workspace
 
+	-- Удаление кубика через 5 секунд
 	game.Debris:AddItem(cube, 5)
 
-	-- Сбивает других игроков
+	-- Обработчик столкновения с другими игроками
 	cube.Touched:Connect(function(hit)
 		local hum = hit.Parent:FindFirstChild("Humanoid")
 		if hum and hum.Health > 0 and hit.Parent ~= character then
+			-- Поставим игрока в режим "платформы" (не может двигаться)
 			hum.PlatformStand = true
+			-- Делаем небольшую паузу, чтобы эффект сработал
 			wait(1)
+			-- Возвращаем способность двигаться
 			hum.PlatformStand = false
+
+			-- Применим небольшой отталкивающий эффект
+			local force = Instance.new("BodyVelocity")
+			force.MaxForce = Vector3.new(10000, 10000, 10000) -- Сила отталкивания
+			force.Velocity = Vector3.new(0, 50, 0) -- Отталкиваем вверх
+			force.Parent = hum.Parent:FindFirstChild("HumanoidRootPart")
+			game.Debris:AddItem(force, 0.1) -- Удаляем после 0.1 секунды
 		end
 	end)
 end)
